@@ -218,7 +218,9 @@ class Server:
         os.close(handle)
         
         # run that script in node.js
-        process = subprocess.Popen(['node', path])
+        env = os.environ
+        env["NODE_PATH"] = NodePath()
+        process = subprocess.Popen(['node', path], env=env)
         def cleanup():
             process.kill()
             os.remove(path)
@@ -248,3 +250,6 @@ class Server:
     
     def close(self):
         self.closed = True
+
+def NodePath():
+    return os.path.join(os.path.dirname(__file__), "node_modules")
