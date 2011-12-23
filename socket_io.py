@@ -139,6 +139,7 @@ class Server:
     
     def __init__(self):
         self.clients = {}
+        self.closed = False
     
     def _handle(self, info):
         command = info['command']
@@ -236,10 +237,14 @@ class Server:
         
         # run the server
         buffer = ''
-        while 1:
+        while not self.closed:
             buffer += sock.recv(4096)
             index = buffer.find('\0')
             while index >= 0:
                 data, buffer = buffer[0:index], buffer[index+1:]
                 self._handle(json.loads(data))
                 index = buffer.find('\0')
+        cleanup()
+    
+    def close(self):
+        self.closed = True
